@@ -53,7 +53,7 @@ class Dataset(object):
         # Initial index for slicing
         start = self._index_in_epoch
         self._index_in_epoch += batch_size
-        
+         
         # Not enough data for a batch: Reset + Shuffling
         if self._index_in_epoch > self._num_examples:
             # Increment finished epoch
