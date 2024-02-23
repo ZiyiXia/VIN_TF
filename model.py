@@ -1,11 +1,13 @@
 import tensorflow as tf
 
+@tf.function
 def VIN(X, S1, S2, args):
     
     k = args.k # Number of Value Iteration computations
     ch_i = args.ch_i # Channels in input layer
     ch_h = args.ch_h # Channels in initial hidden layer
     ch_q = args.ch_q # Channels in q layer (~actions)
+
 
     l_h = tf.keras.layers.Conv2D(filters=ch_h,
                                  kernel_size=(3, 3),
@@ -78,6 +80,7 @@ def VIN(X, S1, S2, args):
     return logits, prob_actions
 
 
+@tf.function
 def attention(tensor, S1, S2):
 
     s1 = tf.reshape(S1, [-1])
