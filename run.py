@@ -7,11 +7,12 @@ import tensorflow as tf
 from model import *
 from dataset import *
 
-@tf.function
-def train(X, S1, S2, y, train_mode):
-    logits, prob_actions = VIN(X, S1, S2, y)
+# @tf.function
+def process(X, S1, S2, y, args, train_mode):
+    logits, prob_actions = VIN(X, S1, S2, args)
 
     # compute the loss
+    y = tf.cast(y, dtype=tf.int32)
     cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=y, logits=logits, name='cross_entropy')
     loss = tf.math.reduce_sum(cross_entropy, name='cross_entropy_sum')
 
@@ -30,8 +31,8 @@ def train(X, S1, S2, y, train_mode):
     return num_err, loss
 
 
-@tf.function
-def train_or_eval(dataset, args, feed_ops, train_mode):
+# @tf.function
+def train_or_eval(dataset, args, train_mode):
 
     num_batches = dataset.num_examples // args.batch_size
     total_examples = num_batches * args.batch_size
@@ -39,12 +40,12 @@ def train_or_eval(dataset, args, feed_ops, train_mode):
     total_err = 0.0
     total_loss = 0.0
     
-    for batch in range(num_batches):
-        X, S1, S2, y = feed_ops
+    for _ in range(num_batches):
+        # X, S1, S2, y = feed_ops
         X_batch, S1_batch, S2_batch, y_batch = dataset.next_batch(args.batch_size)
     
         # call the VIN model
-        err, loss = train(X_batch, S1_batch, S2_batch, y_batch, train_mode)
+        err, loss = process(X_batch, S1_batch, S2_batch, y_batch, args, train_mode)
 
         total_err += err
         total_loss += loss
@@ -101,14 +102,14 @@ parser.add_argument('--logdir',
 
 args = parser.parse_args()
 
-# Input tensor: Stack obstacle image and goal image, i.e. ch_i = 2
-X = tf.keras.Input(shape=(args.imsize, args.imsize, args.ch_i, ), name='X', dtype=tf.float32, )
-# Input batches of vertical positions
-S1 = tf.keras.Input(shape=(1, ), name='S1', dtype=tf.int32)
-# Input batches of horizontal positions
-S2 = tf.keras.Input(shape=(1, ), name='S2', dtype=tf.int32)
-# Labels: actions {0,...,7}
-y = tf.keras.Input(shape=(1, ), name='y', dtype=tf.int32)
+# # Input tensor: Stack obstacle image and goal image, i.e. ch_i = 2
+# X = tf.keras.Input(shape=(args.imsize, args.imsize, args.ch_i, ), name='X', dtype=tf.float32, )
+# # Input batches of vertical positions
+# S1 = tf.keras.Input(shape=(1, ), name='S1', dtype=tf.int32)
+# # Input batches of horizontal positions
+# S2 = tf.keras.Input(shape=(1, ), name='S2', dtype=tf.int32)
+# # Labels: actions {0,...,7}
+# y = tf.keras.Input(shape=(1, ), name='y', dtype=tf.int32)
 
 # load the datasets
 trainset = Dataset(args.datafile, mode='train', imsize=args.imsize)
@@ -119,9 +120,8 @@ for epoch in range(args.epochs):
     start_time = time.time
 
     mean_err, mean_loss = train_or_eval(trainset, 
-                                          args,
-                                          feed_ops=[X, S1, S2, y], 
-                                          train_mode=True)
+                                        args,
+                                        train_mode=True)
     
     time_duration = time.time() - start_time
     out_str = 'Epoch: {:3d} ({:.1f} s): \n\t Train Loss: {:.5f} \t Train Err: {:.5f}'
