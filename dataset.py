@@ -3,9 +3,12 @@ import numpy as np
 class Dataset(object):
     def __init__(self, filepath, mode=None, imsize=None):
         if mode == 'train':
-            data = np.load(filepath).items()[0][1][0]
+            with np.load(filepath, mmap_mode='r', allow_pickle=True) as f:
+                data = f['arr_0'][0]
         elif mode == 'test':
-            data = np.load(filepath).items()[0][1][1]
+            # data = np.load(filepath).items()[0][1][1]
+            with np.load(filepath, mmap_mode='r', allow_pickle=True) as f:
+                data = f['arr_0'][1]
         else:
             raise ValueError('mode can be either train or test.')
             
