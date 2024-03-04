@@ -11,37 +11,37 @@ class VIN(tf.keras.Model):
         self.ch_q = args.ch_q # Channels in q layer (~actions)
 
         self.l_h = tf.keras.layers.Conv2D(filters=self.ch_h,
-                                 kernel_size=(3, 3),
-                                 strides=(1, 1),
-                                 padding='same',
-                                 activation=None,
-                                 use_bias=True,
-                                 kernel_initializer=tf.keras.initializers.TruncatedNormal(stddev=0.01),
-                                 bias_initializer=tf.zeros_initializer(),
-                                 name='h0')
+                                          kernel_size=(3, 3),
+                                          strides=(1, 1),
+                                          padding='same',
+                                          activation=None,
+                                          use_bias=True,
+                                          kernel_initializer=tf.keras.initializers.TruncatedNormal(stddev=0.01),
+                                          bias_initializer=tf.zeros_initializer(),
+                                          name='h0')
         self.l_r = tf.keras.layers.Conv2D(filters=1,
-                                 kernel_size=(3, 3),
-                                 strides=(1, 1),
-                                 padding='same',
-                                 activation=None,
-                                 use_bias=False,
-                                 kernel_initializer=tf.keras.initializers.TruncatedNormal(stddev=0.01),
-                                 bias_initializer=None,
-                                 name='r')
+                                          kernel_size=(3, 3),
+                                          strides=(1, 1),
+                                          padding='same',
+                                          activation=None,
+                                          use_bias=False,
+                                          kernel_initializer=tf.keras.initializers.TruncatedNormal(stddev=0.01),
+                                          bias_initializer=None,
+                                          name='r')
         self.l_q = tf.keras.layers.Conv2D(filters=self.ch_q,
-                                 kernel_size=(3, 3),
-                                 strides=(1, 1),
-                                 padding='same',
-                                 activation=None,
-                                 use_bias=False,
-                                 kernel_initializer=tf.keras.initializers.TruncatedNormal(stddev=0.01),
-                                 bias_initializer=None,
-                                 name='q')
+                                          kernel_size=(3, 3),
+                                          strides=(1, 1),
+                                          padding='same',
+                                          activation=None,
+                                          use_bias=False,
+                                          kernel_initializer=tf.keras.initializers.TruncatedNormal(stddev=0.01),
+                                          bias_initializer=None,
+                                          name='q')
         self.fcl = tf.keras.layers.Dense(units=8,
-                                activation=None,
-                                use_bias=False,
-                                kernel_initializer=tf.keras.initializers.TruncatedNormal(stddev=0.01),
-                                name='logits')
+                                         activation=None,
+                                         use_bias=False,
+                                         kernel_initializer=tf.keras.initializers.TruncatedNormal(stddev=0.01),
+                                         name='logits')
         
     def call(self, X, S1, S2):
         h = self.l_h(X)

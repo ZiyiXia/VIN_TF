@@ -36,8 +36,9 @@ def train_or_eval(model, dataset, args, train_mode):
             cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=y, logits=logits, name='cross_entropy')
             loss = tf.math.reduce_sum(cross_entropy, name='cross_entropy_sum')
 
-        grads = tape.gradient(cross_entropy, model.trainable_weights)
-        optimizer.apply_gradients(zip(grads, model.trainable_weights))
+        # grads = tape.gradient(cross_entropy, model.trainable_weights)
+        # optimizer.apply_gradients(zip(grads, model.trainable_weights))
+        optimizer.minimize(cross_entropy, model.trainable_weights, tape=tape)
 
         total_err += err
         total_loss += loss
@@ -102,6 +103,8 @@ model = VIN(args)
 
 # start training
 for epoch in range(args.epochs):
+    print("==============================")
+
     start_time = time.time()
 
     mean_err, mean_loss = train_or_eval(model,
@@ -123,7 +126,7 @@ for epoch in range(args.epochs):
                                         args, 
                                         train_mode=False)
     
-    print('Test Accuracy: {:.2f}%'.format(100*(1 - mean_err)))
+    print('Test Accuracy: {:.2f}%\n'.format(100*(1 - mean_err)))
 
 
 
